@@ -1,13 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoseCatVintage</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoseCat Vintage</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #f5eee4;
+      overflow: hidden;
+    }
+
+
+    .page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* Light overlay so the announcement is easy to read */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(245, 238, 228, 0.08);
+    }
+
+    .coming-soon {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 24px 42px;
+      background: rgba(250, 244, 235, 0.88);
+      border: 1px solid rgba(150, 105, 84, 0.75);
+      box-shadow: 0 8px 30px rgba(70, 45, 35, 0.18);
+      color: #49352c;
+      max-width: min(90vw, 620px);
+    }
+
+    .coming-soon::before,
+    .coming-soon::after {
+      content: "✦";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #a66f5c;
+      font-size: 18px;
+    }
+
+    .coming-soon::before {
+      left: 16px;
+    }
+
+    .coming-soon::after {
+      right: 16px;
+    }
+
+    .coming-soon h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: #8f5d4d;
+    }
+
+    .coming-soon p {
+      margin: 9px 0 0;
+      font-size: clamp(15px, 1.8vw, 21px);
+      font-style: italic;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 500px) {
+      .background {
+        object-position: center center;
+      }
+
+      .coming-soon {
+        padding: 20px 34px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <h1>
-        Website under maintenance. 
-    </h1>
+  <main class="page">
+    <img
+      class="background"
+      src="rosecat.png"
+      alt="RoseCat Vintage x 1974 Studioo"
+    >
+
+    <div class="overlay"></div>
+
+    <section class="coming-soon" aria-label="Website coming soon">
+      <h1>Website Coming Soon</h1>
+      <p>Vintage is on its way...</p>
+    </section>
+  </main>
 </body>
 </html>
