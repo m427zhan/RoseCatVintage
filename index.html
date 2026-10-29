@@ -1,125 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RoseCat Vintage</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-    }
-
-    body {
-      font-family: Georgia, "Times New Roman", serif;
-      background: #f5eee4;
-      overflow: hidden;
-    }
-
-
-    .page {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .background {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    /* Light overlay so the announcement is easy to read */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(245, 238, 228, 0.08);
-    }
-
-    .coming-soon {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 24px 42px;
-      background: rgba(250, 244, 235, 0.88);
-      border: 1px solid rgba(150, 105, 84, 0.75);
-      box-shadow: 0 8px 30px rgba(70, 45, 35, 0.18);
-      color: #49352c;
-      max-width: min(90vw, 620px);
-    }
-
-    .coming-soon::before,
-    .coming-soon::after {
-      content: "✦";
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #a66f5c;
-      font-size: 18px;
-    }
-
-    .coming-soon::before {
-      left: 16px;
-    }
-
-    .coming-soon::after {
-      right: 16px;
-    }
-
-    .coming-soon h1 {
-      margin: 0;
-      font-size: clamp(28px, 4vw, 52px);
-      font-weight: 500;
-      letter-spacing: 2px;
-      color: #8f5d4d;
-    }
-
-    .coming-soon p {
-      margin: 9px 0 0;
-      font-size: clamp(15px, 1.8vw, 21px);
-      font-style: italic;
-      letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 500px) {
-      .background {
-        object-position: center center;
-      }
-
-      .coming-soon {
-        padding: 20px 34px;
-      }
-    }
-  </style>
+  <meta name="description" content="Hand-picked vintage and antique jewelry. Browse the collection, then purchase through our Etsy or eBay shop.">
+  <link rel="icon" href="Logo/RoseCat_1254x1254.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-  <main class="page">
-    <img
-      class="background"
-      src="rosecat.png"
-      alt="RoseCat Vintage x 1974 Studioo"
-    >
 
-    <div class="overlay"></div>
+  <!-- ========== Header ========== -->
+  <header class="site-header">
+    <a class="brand" href="#top">
+      <img src="Logo/RoseCat_1254x1254.png" alt="" class="brand-mark">
+      <span class="brand-name">RoseCat <em>Vintage</em></span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#collection">Collection</a>
+      <a href="#birthstones">Birthstones</a>
+      <a href="#services">Services</a>
+      <a href="#how-to-buy">How to Buy</a>
+      <a href="#visit">Contact</a>
+    </nav>
+    <button class="wish-toggle" id="wishToggle" aria-label="Open wishlist">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4h2c.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>
+      <span id="wishCount">0</span>
+    </button>
+  </header>
 
-    <section class="coming-soon" aria-label="Website coming soon">
-      <h1>Website Coming Soon</h1>
-      <p>Vintage is on its way...</p>
+  <main id="top">
+
+    <!-- ========== Hero ========== -->
+    <section class="hero">
+      <div class="hero-copy reveal">
+        <p class="script">a little treasure box</p>
+        <h1>RoseCat <span>Vintage</span></h1>
+        <p class="eyebrow">Vintage &amp; Antique Jewelry</p>
+        <p class="lede">Rings, lockets and brooches we picked and restored ourselves. Each one has had a long life already. Every piece in the case is ready to go home with you.</p>
+        <div class="quote-plaque">
+          <p>Antique jewelry:<br>older than your ex,<br>but way more loyal.</p>
+          <span class="plaque-heart">&#9829;</span>
+        </div>
+        <div class="hero-ctas">
+          <a href="#collection" class="btn btn-primary">Browse the Collection</a>
+          <a href="#how-to-buy" class="btn btn-ghost">How to Purchase</a>
+        </div>
+      </div>
+
+      <div class="hero-art reveal">
+        <div class="tilt-frame" id="heroTilt">
+          <img src="Logo/RoseCat_1254x1254.png" alt="RoseCat Vintage logo: a tuxedo cat wearing a cameo necklace beside a pink rose" id="heroLogo">
+          <span class="twinkle" style="--x:12%;--y:22%;--d:0s"></span>
+          <span class="twinkle" style="--x:86%;--y:30%;--d:.8s"></span>
+          <span class="twinkle" style="--x:78%;--y:78%;--d:1.6s"></span>
+          <span class="twinkle" style="--x:18%;--y:70%;--d:2.2s"></span>
+        </div>
+        <p class="hint">psst, give the cat a click</p>
+      </div>
+    </section>
+
+    <!-- ========== Era ribbon ========== -->
+    <div class="ribbon" aria-hidden="true">
+      <div class="ribbon-track">
+        <span>Victorian</span><i>&#10022;</i><span>Edwardian</span><i>&#10022;</i><span>Art Deco</span><i>&#10022;</i><span>Retro</span><i>&#10022;</i><span>Mid-Century</span><i>&#10022;</i><span>Gold &amp; Silver Chasing</span><i>&#10022;</i><span>Custom Pieces</span><i>&#10022;</i>
+        <span>Victorian</span><i>&#10022;</i><span>Edwardian</span><i>&#10022;</i><span>Art Deco</span><i>&#10022;</i><span>Retro</span><i>&#10022;</i><span>Mid-Century</span><i>&#10022;</i><span>Gold &amp; Silver Chasing</span><i>&#10022;</i><span>Custom Pieces</span><i>&#10022;</i>
+      </div>
+    </div>
+
+    <!-- ========== Collection ========== -->
+    <section class="section" id="collection">
+      <header class="section-head reveal">
+        <p class="script">the jewelry case</p>
+        <h2>The Collection</h2>
+        <div class="flourish" aria-hidden="true"></div>
+        <p>Choose an era on the timeline, then tap any piece for a closer look.</p>
+      </header>
+
+      <div class="timeline reveal" id="timeline" role="tablist" aria-label="Filter by era"></div>
+      <div class="era-note reveal" id="eraNote" aria-live="polite"></div>
+
+      <div class="chips reveal" id="chips" role="group" aria-label="Filter by type"></div>
+      <p class="result-count" id="resultCount" aria-live="polite"></p>
+
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- ========== Birthstones ========== -->
+    <section class="section section-tint" id="birthstones">
+      <header class="section-head reveal">
+        <p class="script">made for you</p>
+        <h2>Birthstone Finder</h2>
+        <div class="flourish" aria-hidden="true"></div>
+        <p>Choose a month to see its stone and any matching pieces in the case.</p>
+      </header>
+      <div class="months reveal" id="months" role="tablist" aria-label="Birth month"></div>
+      <div class="stone-card reveal" id="stoneCard" aria-live="polite"></div>
+    </section>
+
+    <!-- ========== Services ========== -->
+    <section class="section" id="services">
+      <header class="section-head reveal">
+        <p class="script">RoseCat Vintage &times; 1974 Studioo</p>
+        <h2>Products &amp; Services</h2>
+        <div class="flourish" aria-hidden="true"></div>
+        <p>Hover over or tap a card for details.</p>
+      </header>
+      <div class="services" id="services-grid"></div>
+    </section>
+
+    <!-- ========== How to buy ========== -->
+    <section class="section section-tint" id="how-to-buy">
+      <header class="section-head reveal">
+        <p class="script">bringing it home</p>
+        <h2>How to Purchase</h2>
+        <div class="flourish" aria-hidden="true"></div>
+        <p>This site is our display case. All purchases go through our Etsy and eBay shops, so you get their buyer protection and checkout.</p>
+      </header>
+      <ol class="steps reveal">
+        <li><span class="step-num">I</span><h3>Find your piece</h3><p>Browse the case and add favorites to your wishlist with the heart.</p></li>
+        <li><span class="step-num">II</span><h3>Choose a shop</h3><p>Each piece links to its Etsy or eBay listing. Use whichever one you like.</p></li>
+        <li><span class="step-num">III</span><h3>Unwrap the bow</h3><p>We pack each order with care, ready to give as a gift.</p></li>
+      </ol>
+      <div class="shop-links reveal">
+        <a class="btn btn-primary shop-etsy" target="_blank" rel="noopener">Visit our Etsy Shop</a>
+        <a class="btn btn-ghost shop-ebay" target="_blank" rel="noopener">Visit our eBay Store</a>
+      </div>
+    </section>
+
+    <!-- ========== Contact ========== -->
+    <section class="section visit" id="visit">
+      <div class="visit-card reveal">
+        <img src="Logo/RoseCat_1254x1254.png" alt="" class="visit-logo">
+        <div>
+          <p class="script">say hello</p>
+          <h2>Looking for something special?</h2>
+          <p>We can find a particular piece, size a ring, repair an heirloom, or make something new. Send us a message.</p>
+          <ul class="contact-list">
+            <li><span class="ci ci-mail">&#9993;</span><a href="mailto:rosecatvintage@gmail.com">rosecatvintage@gmail.com</a></li>
+            <li><span class="ci ci-ig">&#9673;</span><a href="https://instagram.com/rosecatvintage" target="_blank" rel="noopener">@rosecatvintage</a></li>
+            <li><span class="ci ci-web">&#10047;</span><span>rosecatvintage.com</span></li>
+          </ul>
+        </div>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="flourish" aria-hidden="true"></div>
+    <p>&copy; <span id="year"></span> RoseCat Vintage &middot; in collaboration with 1974 Studioo</p>
+  </footer>
+
+  <!-- ========== Quick-view modal ========== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" data-close aria-label="Close">&times;</button>
+      <div class="modal-media" id="modalMedia">
+        <div class="loupe" id="loupe" aria-hidden="true"></div>
+        <p class="loupe-hint">move over the piece to magnify</p>
+      </div>
+      <div class="modal-info" id="modalInfo"></div>
+    </div>
+  </div>
+
+  <!-- ========== Wishlist drawer ========== -->
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Wishlist">
+    <div class="drawer-head">
+      <h2>Your Wishlist</h2>
+      <button class="modal-close" id="drawerClose" aria-label="Close wishlist">&times;</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+  <div class="drawer-scrim" id="drawerScrim"></div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
