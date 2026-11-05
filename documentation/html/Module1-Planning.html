@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 1 — Planning · Rosecat Vintage Docs</title>
+<style>
+:root {
+  --bg: #fbf7f4; --panel: #ffffff; --text: #2e2a28; --muted: #7a6e69;
+  --accent: #b5566e; --border: #eadfd9; --code-bg: #f3ece8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1918; --panel: #242120; --text: #ece6e3; --muted: #a89c97;
+    --accent: #e48aa1; --border: #3a3432; --code-bg: #2d2826;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.layout { display: flex; min-height: 100vh; }
+nav { width: 260px; flex-shrink: 0; background: var(--panel);
+  border-right: 1px solid var(--border); padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent);
+  margin: 0 8px 16px; display: block; text-decoration: none; }
+nav a.item { display: block; padding: 8px 10px; border-radius: 6px;
+  color: var(--text); text-decoration: none; font-size: .95rem; }
+nav a.item:hover { background: var(--code-bg); }
+nav a.item.active { background: var(--accent); color: #fff; }
+main { flex: 1; min-width: 0; padding: 40px 48px; max-width: 900px; }
+h1 { color: var(--accent); margin-top: 0; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-top: 2em; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+blockquote { margin: 1em 0; padding: 8px 16px; border-left: 4px solid var(--accent);
+  background: var(--code-bg); color: var(--muted); border-radius: 0 6px 6px 0; }
+blockquote p { margin: 0; }
+code { background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code-bg); padding: 14px; border-radius: 8px; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: var(--code-bg); }
+ul.task-list { list-style: none; padding-left: 4px; }
+ul.task-list input { margin-right: 8px; accent-color: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px; text-decoration: none; color: var(--text); }
+.card:hover { border-color: var(--accent); }
+.card .num { color: var(--accent); font-weight: 700; font-size: .85rem; }
+.card .title { font-weight: 600; font-size: 1.05rem; }
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  nav { width: 100%; height: auto; position: static; border-right: 0;
+    border-bottom: 1px solid var(--border); }
+  main { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav><a class="brand" href="index.html">Rosecat Vintage Docs</a>
+<a class="item active" href="Module1-Planning.html">Module 1 — Planning</a>
+<a class="item" href="Module2-Design.html">Module 2 — Design</a>
+<a class="item" href="Module3-Build.html">Module 3 — Build</a>
+<a class="item" href="Module4-Content.html">Module 4 — Content</a>
+<a class="item" href="Module5-Launch.html">Module 5 — Test &amp; Launch</a></nav>
+<main><h1>Module 1 — Planning</h1>
+<p><strong>Goal:</strong> Decide what the Rosecat Vintage website needs to say and where it sends visitors.</p>
+<p>The site is a simple display website. It shows the brand and sends shoppers to the marketplaces where the items are actually sold. It has no checkout, no database and no customer accounts.</p>
+<hr />
+<h2>1.1 Purpose</h2>
+<blockquote>
+<p><em>e.g. "Introduce Rosecat Vintage and send visitors to our eBay, Etsy and other shops."</em></p>
+</blockquote>
+<p>What should a visitor do after landing on the site?</p>
+<ol>
+<li>Get a feel for the brand</li>
+<li>Click through to a marketplace shop</li>
+<li>Follow on social media or get in touch</li>
+</ol>
+<hr />
+<h2>1.2 Marketplace &amp; Social Links</h2>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>URL</th>
+<th>Include?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eBay</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Etsy</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Depop / Poshmark / Vinted</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Instagram</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Facebook / TikTok</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Contact email</td>
+<td><em>TBD</em></td>
+<td>☐</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>1.3 Site Structure</h2>
+<p>A single page with sections is the simplest option and is recommended:</p>
+<pre><code>index.html
+├── Hero        (logo, tagline, &quot;Shop Now&quot; buttons)
+├── About       (short brand story)
+├── Shop        (cards linking to eBay, Etsy, etc.)
+├── Gallery     (a few featured photos, optional)
+└── Contact     (email + social links)
+</code></pre>
+<p>You can add separate pages later if the site grows.</p>
+<hr />
+<h2>1.4 Domain</h2>
+<ul>
+<li>Domain name: <em>e.g. <code>rosecatvintage.com</code></em></li>
+<li>Register through Cloudflare Registrar (or move an existing domain to Cloudflare DNS)</li>
+</ul>
+<hr />
+<h2>✅ Module 1 Checklist</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Purpose written</li>
+<li><input type="checkbox" disabled> All marketplace and social links collected</li>
+<li><input type="checkbox" disabled> Sections decided</li>
+<li><input type="checkbox" disabled> Domain chosen</li>
+</ul>
+<p><strong>Next:</strong> <a href="Module2-Design.html">Module 2 — Design</a></p></main>
+</div>
+</body>
+</html>

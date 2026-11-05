@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Rosecat Vintage — A Stroll Down Rosecat Lane</title>
+  <meta name="description" content="Step onto a gaslit 1890s London street and browse Rosecat Vintage: fine jewellery, charms, home décor, clothing and accessories.">
+
+  <!-- Social sharing (Open Graph). TODO: replace URL and add images/share.jpg (1200×630) -->
+  <meta property="og:title" content="Rosecat Vintage — Rosecat Lane">
+  <meta property="og:description" content="Stroll a Victorian London street and step inside our vintage shops.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rosecatvintage.com/">
+  <meta property="og:image" content="https://rosecatvintage.com/images/share.jpg">
+
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/street.css">
+</head>
+<body>
+
+  <div id="game" aria-hidden="true"></div>
+  <div id="crosshair" hidden></div>
+
+  <!-- ========== Heads-up display ========== -->
+  <header id="hud" hidden>
+    <div class="hud-place">
+      <img src="images/logo.svg" alt="" width="28" height="28">
+      <span><strong>Rosecat Vintage</strong> · <span id="place">Rosecat Lane</span></span>
+    </div>
+    <div class="hud-btns">
+      <button id="btnSound" type="button" aria-pressed="true">Sound: on</button>
+      <button id="btnVoice" type="button" aria-pressed="false">Voices: off</button>
+      <button id="btnHelp" type="button" aria-label="How to play">?</button>
+      <a href="classic.html" class="hud-link">Simple page</a>
+    </div>
+  </header>
+
+  <button id="btnLeave" type="button" hidden>Leave the shop</button>
+
+  <!-- Movement arrows (hold to walk) -->
+  <div id="pad" class="pad" hidden>
+    <button type="button" data-dir="f" class="up" aria-label="Walk forward">▲</button>
+    <button type="button" data-dir="l" class="left" aria-label="Step left">◀</button>
+    <button type="button" data-dir="b" class="down" aria-label="Walk backward">▼</button>
+    <button type="button" data-dir="r" class="right" aria-label="Step right">▶</button>
+  </div>
+
+  <!-- "Would you like to go in?" -->
+  <div id="prompt" class="card prompt" role="dialog" aria-labelledby="promptTitle" hidden>
+    <p id="promptTitle" class="prompt-title"></p>
+    <p id="promptSub" class="prompt-sub"></p>
+    <p id="promptText"></p>
+    <div class="prompt-btns">
+      <button id="promptYes" type="button" class="btn-gold">Yes</button>
+      <button id="promptNo" type="button" class="btn-plain">Maybe later</button>
+    </div>
+  </div>
+
+  <!-- Shopkeeper subtitles -->
+  <div id="subtitle" aria-live="polite" hidden>
+    <span id="subSpeaker" class="sub-speaker"></span>
+    <span id="subText"></span>
+    <span class="sub-more" aria-hidden="true">▸</span>
+  </div>
+
+  <!-- The item you're holding -->
+  <div id="itemCard" class="card item-card" hidden>
+    <h2 id="itemName"></h2>
+    <p id="itemShop" class="item-shop"></p>
+    <div class="prompt-btns">
+      <a id="itemLink" class="btn-gold" href="#" target="_blank" rel="noopener">See it in our online shop ↗</a>
+      <button id="itemPut" type="button" class="btn-plain">Put it back</button>
+    </div>
+  </div>
+
+  <div id="hoverTag" hidden></div>
+  <div id="fade"></div>
+
+  <!-- ========== Title card ========== -->
+  <section id="intro">
+    <div class="card intro-card">
+      <img src="images/logo.svg" alt="" width="56" height="56">
+      <p class="eyebrow">Rosecat Vintage presents</p>
+      <h1>Rosecat Lane</h1>
+      <p class="intro-year">London · 1895</p>
+      <p class="intro-lead">Take a gaslit stroll down our street of little shops: fine jewellery, charms, home décor, clothing, hats &amp; gloves, and curiosities. Step inside any door, and the shopkeeper will be glad to see you.</p>
+      <ul class="intro-how">
+        <li><strong>Look around:</strong> drag with the mouse (or your finger)</li>
+        <li><strong>Walk:</strong> hold the arrow buttons, or use W A S D / arrow keys</li>
+        <li><strong>Inside a shop:</strong> click an item to pick it up</li>
+      </ul>
+      <button id="btnStart" type="button" class="btn-gold btn-big" disabled>Step onto the street</button>
+      <p id="introStatus" class="intro-status">Lighting the gas lamps…</p>
+      <p class="intro-alt"><a href="classic.html">Or browse our simple shop page →</a></p>
+    </div>
+  </section>
+
+  <!-- ========== Help ========== -->
+  <div id="help" class="card help" role="dialog" aria-labelledby="helpTitle" hidden>
+    <h2 id="helpTitle">How to stroll</h2>
+    <ul class="intro-how">
+      <li><strong>Look:</strong> drag on the screen. Q / E also turn.</li>
+      <li><strong>Walk:</strong> hold ▲ ▼ ◀ ▶, or W A S D / arrow keys.</li>
+      <li><strong>Enter a shop:</strong> walk up to its door and choose “Yes”.</li>
+      <li><strong>Inside:</strong> click any item to pick it up. “Put it back” or Esc to return it.</li>
+      <li><strong>Subtitles:</strong> click them (or press Space) to move on.</li>
+      <li><strong>Leave:</strong> walk back to the door, or press “Leave the shop”.</li>
+    </ul>
+    <button id="helpClose" type="button" class="btn-gold">Carry on</button>
+  </div>
+
+  <noscript>
+    <div class="card noscript">This street needs JavaScript. <a href="classic.html">Visit our simple shop page instead.</a></div>
+  </noscript>
+
+  <script src="js/vendor/three.min.js"></script>
+  <script src="js/street/config.js"></script>
+  <script src="js/street/textures.js"></script>
+  <script src="js/street/props.js"></script>
+  <script src="js/street/world.js"></script>
+  <script src="js/street/game.js"></script>
+</body>
+</html>

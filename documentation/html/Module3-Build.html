@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 3 — Build · Rosecat Vintage Docs</title>
+<style>
+:root {
+  --bg: #fbf7f4; --panel: #ffffff; --text: #2e2a28; --muted: #7a6e69;
+  --accent: #b5566e; --border: #eadfd9; --code-bg: #f3ece8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1918; --panel: #242120; --text: #ece6e3; --muted: #a89c97;
+    --accent: #e48aa1; --border: #3a3432; --code-bg: #2d2826;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.layout { display: flex; min-height: 100vh; }
+nav { width: 260px; flex-shrink: 0; background: var(--panel);
+  border-right: 1px solid var(--border); padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent);
+  margin: 0 8px 16px; display: block; text-decoration: none; }
+nav a.item { display: block; padding: 8px 10px; border-radius: 6px;
+  color: var(--text); text-decoration: none; font-size: .95rem; }
+nav a.item:hover { background: var(--code-bg); }
+nav a.item.active { background: var(--accent); color: #fff; }
+main { flex: 1; min-width: 0; padding: 40px 48px; max-width: 900px; }
+h1 { color: var(--accent); margin-top: 0; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-top: 2em; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+blockquote { margin: 1em 0; padding: 8px 16px; border-left: 4px solid var(--accent);
+  background: var(--code-bg); color: var(--muted); border-radius: 0 6px 6px 0; }
+blockquote p { margin: 0; }
+code { background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code-bg); padding: 14px; border-radius: 8px; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: var(--code-bg); }
+ul.task-list { list-style: none; padding-left: 4px; }
+ul.task-list input { margin-right: 8px; accent-color: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px; text-decoration: none; color: var(--text); }
+.card:hover { border-color: var(--accent); }
+.card .num { color: var(--accent); font-weight: 700; font-size: .85rem; }
+.card .title { font-weight: 600; font-size: 1.05rem; }
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  nav { width: 100%; height: auto; position: static; border-right: 0;
+    border-bottom: 1px solid var(--border); }
+  main { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav><a class="brand" href="index.html">Rosecat Vintage Docs</a>
+<a class="item" href="Module1-Planning.html">Module 1 — Planning</a>
+<a class="item" href="Module2-Design.html">Module 2 — Design</a>
+<a class="item active" href="Module3-Build.html">Module 3 — Build</a>
+<a class="item" href="Module4-Content.html">Module 4 — Content</a>
+<a class="item" href="Module5-Launch.html">Module 5 — Test &amp; Launch</a></nav>
+<main><h1>Module 3 — Build</h1>
+<p><strong>Goal:</strong> Build the site with plain HTML and CSS. It needs no framework, no build step and no database.</p>
+<hr />
+<h2>3.1 Tools</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> VS Code (with the <strong>Live Server</strong> extension for previewing)</li>
+<li><input type="checkbox" disabled> Git + GitHub account (optional, but makes Cloudflare deploys automatic)</li>
+</ul>
+<hr />
+<h2>3.2 Folder Structure (<code>code/</code>)</h2>
+<pre><code>code/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   └── main.js        (optional: mobile menu, small effects)
+└── images/
+    ├── logo.png
+    ├── hero.jpg
+    └── gallery/
+</code></pre>
+<hr />
+<h2>3.3 Build Steps</h2>
+<ol>
+<li><strong>Base styles:</strong> set up the colors and fonts from Module 2 as CSS variables</li>
+<li><strong>Header:</strong> logo and simple navigation (anchor links to each section)</li>
+<li><strong>Hero:</strong> tagline and "Shop on eBay" / "Shop on Etsy" buttons</li>
+<li><strong>About section</strong></li>
+<li><strong>Shop section:</strong> a card per marketplace that opens in a new tab</li>
+<li><strong>Gallery section</strong> (optional)</li>
+<li><strong>Footer:</strong> email link (<code>mailto:</code>), social icons, © year</li>
+</ol>
+<p>Marketplace link example:</p>
+<pre><code class="language-html">&lt;a href=&quot;https://www.etsy.com/shop/YOURSHOP&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+  Shop on Etsy
+&lt;/a&gt;
+</code></pre>
+<hr />
+<h2>3.4 Must-haves</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Works on phones (mobile-first CSS)</li>
+<li><input type="checkbox" disabled> Every image has <code>alt</code> text</li>
+<li><input type="checkbox" disabled> Images compressed (WebP, under ~300 KB each)</li>
+<li><input type="checkbox" disabled> Page <code>&lt;title&gt;</code> and meta description set</li>
+<li><input type="checkbox" disabled> Favicon</li>
+</ul>
+<hr />
+<h2>✅ Module 3 Checklist</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> All sections built</li>
+<li><input type="checkbox" disabled> All links point to the right shops</li>
+<li><input type="checkbox" disabled> Looks good on phone and desktop</li>
+</ul>
+<p><strong>Previous:</strong> <a href="Module2-Design.html">Module 2 — Design</a> · <strong>Next:</strong> <a href="Module4-Content.html">Module 4 — Content</a></p></main>
+</div>
+</body>
+</html>

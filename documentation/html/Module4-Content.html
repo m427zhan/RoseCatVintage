@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 4 — Content · Rosecat Vintage Docs</title>
+<style>
+:root {
+  --bg: #fbf7f4; --panel: #ffffff; --text: #2e2a28; --muted: #7a6e69;
+  --accent: #b5566e; --border: #eadfd9; --code-bg: #f3ece8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1918; --panel: #242120; --text: #ece6e3; --muted: #a89c97;
+    --accent: #e48aa1; --border: #3a3432; --code-bg: #2d2826;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.layout { display: flex; min-height: 100vh; }
+nav { width: 260px; flex-shrink: 0; background: var(--panel);
+  border-right: 1px solid var(--border); padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent);
+  margin: 0 8px 16px; display: block; text-decoration: none; }
+nav a.item { display: block; padding: 8px 10px; border-radius: 6px;
+  color: var(--text); text-decoration: none; font-size: .95rem; }
+nav a.item:hover { background: var(--code-bg); }
+nav a.item.active { background: var(--accent); color: #fff; }
+main { flex: 1; min-width: 0; padding: 40px 48px; max-width: 900px; }
+h1 { color: var(--accent); margin-top: 0; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-top: 2em; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+blockquote { margin: 1em 0; padding: 8px 16px; border-left: 4px solid var(--accent);
+  background: var(--code-bg); color: var(--muted); border-radius: 0 6px 6px 0; }
+blockquote p { margin: 0; }
+code { background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code-bg); padding: 14px; border-radius: 8px; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: var(--code-bg); }
+ul.task-list { list-style: none; padding-left: 4px; }
+ul.task-list input { margin-right: 8px; accent-color: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px; text-decoration: none; color: var(--text); }
+.card:hover { border-color: var(--accent); }
+.card .num { color: var(--accent); font-weight: 700; font-size: .85rem; }
+.card .title { font-weight: 600; font-size: 1.05rem; }
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  nav { width: 100%; height: auto; position: static; border-right: 0;
+    border-bottom: 1px solid var(--border); }
+  main { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav><a class="brand" href="index.html">Rosecat Vintage Docs</a>
+<a class="item" href="Module1-Planning.html">Module 1 — Planning</a>
+<a class="item" href="Module2-Design.html">Module 2 — Design</a>
+<a class="item" href="Module3-Build.html">Module 3 — Build</a>
+<a class="item active" href="Module4-Content.html">Module 4 — Content</a>
+<a class="item" href="Module5-Launch.html">Module 5 — Test &amp; Launch</a></nav>
+<main><h1>Module 4 — Content</h1>
+<p><strong>Goal:</strong> Write the text and prepare the photos.</p>
+<hr />
+<h2>4.1 Text</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Content</th>
+<th>Done?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hero</td>
+<td>Tagline (one line)</td>
+<td>☐</td>
+</tr>
+<tr>
+<td>About</td>
+<td>2–3 short paragraphs: who you are, what you sell, what makes it special</td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Shop</td>
+<td>One line per marketplace (e.g. "Clothing &amp; accessories on Etsy")</td>
+<td>☐</td>
+</tr>
+<tr>
+<td>Contact</td>
+<td>Email, response time, social handles</td>
+<td>☐</td>
+</tr>
+</tbody>
+</table>
+<p>Tips: keep it short and friendly, and write in the brand's voice.</p>
+<hr />
+<h2>4.2 Photos</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Logo (PNG or SVG, transparent background)</li>
+<li><input type="checkbox" disabled> One hero / banner image</li>
+<li><input type="checkbox" disabled> 4–8 gallery photos of favorite pieces</li>
+<li><input type="checkbox" disabled> Consistent lighting and background</li>
+<li><input type="checkbox" disabled> Resized (max ~1600px wide) and compressed (e.g. with squoosh.app)</li>
+<li><input type="checkbox" disabled> Descriptive file names (<code>1970s-floral-dress.webp</code>)</li>
+</ul>
+<hr />
+<h2>4.3 Search &amp; Sharing Basics</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Page title: <em>e.g. "Rosecat Vintage — Curated Vintage Clothing &amp; Finds"</em></li>
+<li><input type="checkbox" disabled> Meta description (≤ 160 characters)</li>
+<li><input type="checkbox" disabled> Social share image (Open Graph tag) so links look good on Instagram and Facebook</li>
+</ul>
+<hr />
+<h2>✅ Module 4 Checklist</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> All text written and proofread</li>
+<li><input type="checkbox" disabled> Photos prepared and added</li>
+<li><input type="checkbox" disabled> Title, description and share image set</li>
+</ul>
+<p><strong>Previous:</strong> <a href="Module3-Build.html">Module 3 — Build</a> · <strong>Next:</strong> <a href="Module5-Launch.html">Module 5 — Test &amp; Launch</a></p></main>
+</div>
+</body>
+</html>

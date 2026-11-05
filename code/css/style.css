@@ -1,0 +1,282 @@
+/* =========================================================
+   Rosecat Vintage — styles
+   Brand colors and fonts live in :root. Change them here.
+   ========================================================= */
+
+:root {
+  /* TODO: final brand colors (Module 2) */
+  --color-primary: #b76e79;      /* dusty rose */
+  --color-primary-dark: #9a5561;
+  --color-bg: #fbf6f1;           /* warm cream */
+  --color-bg-alt: #f3e9e1;
+  --color-text: #3a2e2c;         /* deep brown */
+  --color-muted: #7a6a66;
+  --color-border: #e4d6cc;
+
+  /* TODO: final fonts (Module 2) */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Lato", system-ui, sans-serif;
+
+  --radius: 10px;
+  --max-width: 1100px;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+img { max-width: 100%; display: block; }
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 .5em;
+}
+
+a { color: var(--color-primary-dark); }
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  padding: .8em 1.6em;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid var(--color-primary);
+  transition: background .2s, color .2s;
+}
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+.btn-outline { background: transparent; color: var(--color-primary-dark); }
+.btn-outline:hover { background: var(--color-primary); color: #fff; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(251, 246, 241, .95);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(6px);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: none;
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  flex-direction: column;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 20px 16px;
+}
+.site-nav.open { display: flex; }
+.site-nav a {
+  padding: 10px 0;
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 700;
+}
+.site-nav a:hover { color: var(--color-primary); }
+
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: 0;
+  padding: 8px;
+  cursor: pointer;
+}
+.nav-toggle span {
+  width: 24px;
+  height: 2px;
+  background: var(--color-text);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  /* TODO: swap gradient for a photo, e.g.
+     background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url("../images/hero.webp") center/cover; */
+  background: linear-gradient(135deg, #f3e1dc 0%, #e9c9c6 50%, #d9a9ae 100%);
+  text-align: center;
+  padding: 90px 0 100px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: .8rem;
+  color: var(--color-primary-dark);
+  margin: 0 0 1em;
+}
+
+.hero h1 { font-size: clamp(2.2rem, 7vw, 3.8rem); }
+.hero h1 em { font-weight: 500; color: var(--color-primary-dark); }
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--color-muted);
+  max-width: 34em;
+  margin: 0 auto 2em;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ---------- Sections ---------- */
+.section { padding: 80px 0; }
+.section-alt { background: var(--color-bg-alt); }
+
+.section-title {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  text-align: center;
+}
+.section-intro {
+  text-align: center;
+  color: var(--color-muted);
+  max-width: 36em;
+  margin: 0 auto 2.5em;
+}
+
+/* Placeholder boxes (remove once real photos are in) */
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(45deg, #ead9d0, #ead9d0 12px, #e4d0c6 12px, #e4d0c6 24px);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  font-size: .9rem;
+  aspect-ratio: 4 / 5;
+}
+
+/* ---------- About ---------- */
+.about {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+.about-photo { max-width: 420px; width: 100%; margin: 0 auto; }
+
+/* ---------- Shop ---------- */
+.shop-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.shop-card {
+  display: block;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform .2s, box-shadow .2s;
+}
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(58, 46, 44, .1);
+}
+.shop-card p { color: var(--color-muted); margin: 0 0 1em; }
+.shop-link { color: var(--color-primary-dark); font-weight: 700; }
+
+/* ---------- Gallery ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.gallery-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* ---------- Contact ---------- */
+.contact { text-align: center; }
+
+.social {
+  list-style: none;
+  padding: 0;
+  margin: 2em 0 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.social a { font-weight: 700; text-decoration: none; }
+.social a:hover { text-decoration: underline; }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  padding: 28px 0;
+  text-align: center;
+  font-size: .9rem;
+  color: var(--color-muted);
+  border-top: 1px solid var(--color-border);
+}
+.site-footer p { margin: 0; }
+
+/* ---------- Larger screens ---------- */
+@media (min-width: 768px) {
+  .nav-toggle { display: none; }
+  .site-nav {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    gap: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .about { grid-template-columns: 1fr 1.2fr; }
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}

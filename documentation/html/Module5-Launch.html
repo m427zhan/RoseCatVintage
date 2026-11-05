@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 5 — Test &amp; Launch · Rosecat Vintage Docs</title>
+<style>
+:root {
+  --bg: #fbf7f4; --panel: #ffffff; --text: #2e2a28; --muted: #7a6e69;
+  --accent: #b5566e; --border: #eadfd9; --code-bg: #f3ece8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1918; --panel: #242120; --text: #ece6e3; --muted: #a89c97;
+    --accent: #e48aa1; --border: #3a3432; --code-bg: #2d2826;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.layout { display: flex; min-height: 100vh; }
+nav { width: 260px; flex-shrink: 0; background: var(--panel);
+  border-right: 1px solid var(--border); padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+nav .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent);
+  margin: 0 8px 16px; display: block; text-decoration: none; }
+nav a.item { display: block; padding: 8px 10px; border-radius: 6px;
+  color: var(--text); text-decoration: none; font-size: .95rem; }
+nav a.item:hover { background: var(--code-bg); }
+nav a.item.active { background: var(--accent); color: #fff; }
+main { flex: 1; min-width: 0; padding: 40px 48px; max-width: 900px; }
+h1 { color: var(--accent); margin-top: 0; }
+h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-top: 2em; }
+a { color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+blockquote { margin: 1em 0; padding: 8px 16px; border-left: 4px solid var(--accent);
+  background: var(--code-bg); color: var(--muted); border-radius: 0 6px 6px 0; }
+blockquote p { margin: 0; }
+code { background: var(--code-bg); padding: 2px 5px; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code-bg); padding: 14px; border-radius: 8px; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+th { background: var(--code-bg); }
+ul.task-list { list-style: none; padding-left: 4px; }
+ul.task-list input { margin-right: 8px; accent-color: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px; text-decoration: none; color: var(--text); }
+.card:hover { border-color: var(--accent); }
+.card .num { color: var(--accent); font-weight: 700; font-size: .85rem; }
+.card .title { font-weight: 600; font-size: 1.05rem; }
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  nav { width: 100%; height: auto; position: static; border-right: 0;
+    border-bottom: 1px solid var(--border); }
+  main { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav><a class="brand" href="index.html">Rosecat Vintage Docs</a>
+<a class="item" href="Module1-Planning.html">Module 1 — Planning</a>
+<a class="item" href="Module2-Design.html">Module 2 — Design</a>
+<a class="item" href="Module3-Build.html">Module 3 — Build</a>
+<a class="item" href="Module4-Content.html">Module 4 — Content</a>
+<a class="item active" href="Module5-Launch.html">Module 5 — Test &amp; Launch</a></nav>
+<main><h1>Module 5 — Test &amp; Launch</h1>
+<p><strong>Goal:</strong> Check everything works, then put the site live on Cloudflare.</p>
+<hr />
+<h2>5.1 Quick Test</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Every marketplace and social link opens the right page</li>
+<li><input type="checkbox" disabled> Email link opens a new message</li>
+<li><input type="checkbox" disabled> Looks right on a phone, a tablet and a desktop</li>
+<li><input type="checkbox" disabled> Works in Chrome, Safari and Edge</li>
+<li><input type="checkbox" disabled> All images load</li>
+<li><input type="checkbox" disabled> Spelling checked</li>
+<li><input type="checkbox" disabled> Lighthouse check in Chrome DevTools (aim for 90+)</li>
+</ul>
+<hr />
+<h2>5.2 Deploy to Cloudflare Pages</h2>
+<p>Pick <strong>one</strong> option:</p>
+<p><strong>Option A: Drag &amp; drop (simplest)</strong></p>
+<ol>
+<li>Log in to the Cloudflare dashboard → <strong>Workers &amp; Pages</strong> → <strong>Create</strong> → <strong>Pages</strong> → <strong>Upload assets</strong></li>
+<li>Name the project (e.g. <code>rosecatvintage</code>)</li>
+<li>Drag in the contents of the <code>code/</code> folder</li>
+<li>The site goes live at <code>rosecatvintage.pages.dev</code></li>
+<li>To update the site later, upload a new version the same way</li>
+</ol>
+<p><strong>Option B: Connect GitHub (updates automatically)</strong></p>
+<ol>
+<li>Push the <code>code/</code> folder to a GitHub repository</li>
+<li>In Cloudflare go to <strong>Workers &amp; Pages</strong> → <strong>Create</strong> → <strong>Pages</strong> → <strong>Connect to Git</strong></li>
+<li>Select the repo. Leave the build command empty and set the output directory to <code>/</code> (or <code>code</code> if the repo root is the whole project)</li>
+<li>Every push to <code>main</code> now updates the site</li>
+</ol>
+<hr />
+<h2>5.3 Custom Domain</h2>
+<ol>
+<li>In the Pages project → <strong>Custom domains</strong> → <strong>Set up a custom domain</strong></li>
+<li>Enter <code>rosecatvintage.com</code> (and <code>www.rosecatvintage.com</code>)</li>
+<li>If the domain is on Cloudflare, DNS and HTTPS are set up automatically</li>
+</ol>
+<hr />
+<h2>5.4 After Launch</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Turn on <strong>Cloudflare Web Analytics</strong> (free, no cookie banner needed)</li>
+<li><input type="checkbox" disabled> Add the website link to your eBay, Etsy and social bios</li>
+<li><input type="checkbox" disabled> Announce it on social media</li>
+</ul>
+<h3>Ongoing upkeep</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>How often</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Refresh gallery photos</td>
+<td>Every month or two</td>
+</tr>
+<tr>
+<td>Check all links still work</td>
+<td>Every few months</td>
+</tr>
+<tr>
+<td>Renew domain</td>
+<td>Yearly (turn on auto-renew)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>✅ Module 5 Checklist</h2>
+<ul class="task-list">
+<li><input type="checkbox" disabled> Testing done</li>
+<li><input type="checkbox" disabled> Site live on Cloudflare Pages</li>
+<li><input type="checkbox" disabled> Custom domain connected</li>
+<li><input type="checkbox" disabled> Analytics on</li>
+<li><input type="checkbox" disabled> Link shared everywhere</li>
+</ul>
+<p><strong>Previous:</strong> <a href="Module4-Content.html">Module 4 — Content</a> · <strong>Back to start:</strong> <a href="Module1-Planning.html">Module 1 — Planning</a></p></main>
+</div>
+</body>
+</html>
