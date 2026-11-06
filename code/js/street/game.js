@@ -4,6 +4,11 @@
   const $ = (id) => document.getElementById(id);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const EYE = 1.65;
+  const V3 = THREE.Vector3;
+
+  // Physically based colour pipeline: hex colours are sRGB, lighting is done in linear space
+  THREE.ColorManagement.legacyMode = false;
+  RC.lowPower = window.matchMedia("(pointer: coarse)").matches || Math.min(window.innerWidth, window.innerHeight) < 600;
 
   /* ---------------- Renderer ---------------- */
   let renderer;
@@ -16,9 +21,16 @@
     $("btnStart").onclick = () => (location.href = "classic.html");
     return;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, RC.lowPower ? 1.5 : 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.autoClear = false;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.localClippingEnabled = true;
+  const pmrem = new THREE.PMREMGenerator(renderer);
   $("game").appendChild(renderer.domElement);
 
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 120);
@@ -37,7 +49,25 @@
   envPanel("#6a7488", 8, 2, 0);
   envPanel("#8a6a4a", -8, 2, 3);
   envPanel("#3a4250", 0, 2, -8);
-  const envTex = new THREE.PMREMGenerator(renderer).fromScene(envScene, 0.04).texture;
+  const envTex = pmrem.fromScene(envScene, 0.04).texture;
+
+  // Reflections and soft bounce light for a detailed interior: photograph the room itself from
+  // `envProbe` (twice, so metals in the first picture are already reflecting something)
+  function captureEnv(it) {
+    const sc = it.scene, p = it.envProbe;
+    sc.environment = envTex;
+    let tex = null;
+    for (let pass = 0; pass < 2; pass++) {
+      sc.position.set(-p.x, -p.y, -p.z);
+      sc.updateMatrixWorld(true);
+      const rt = pmrem.fromScene(sc, 0.015, 0.05, 60);
+      sc.position.set(0, 0, 0);
+      sc.updateMatrixWorld(true);
+      tex = rt.texture;
+      sc.environment = tex;
+    }
+    return tex;
+  }
 
   /* ---------------- First-person hands (drawn on top of everything) ---------------- */
   const handScene = new THREE.Scene();
@@ -217,20 +247,52 @@
     },
   };
 
+  /* ---------------- Voices: each member of staff gets their own ---------------- */
+  // spec: "f" / "m", or { gender, pitch, rate, accent }. The same speaker always gets the same voice.
+  const Voices = {
+    list: [], chosen: {},
+    FEMALE: /female|woman|zira|hazel|susan|libby|sonia|maisie|mia|kate|serena|samantha|victoria|karen|moira|fiona|tessa|catherine|jenny|aria|emma|amy|joanna|salli|kimberly|amelie|audrey|aurelie|denise|eloise|julie|hortense|marie|celine|virginie|elsa/i,
+    MALE: /\bmale|\bman\b|david|george|ryan|thomas|daniel|james|mark|guy|arthur|oliver|alex|fred|henri|paul|claude|thierry|nicolas|remy|antoine|jacques|brian|eric|liam|william|christopher|gordon/i,
+    load() { this.list = window.speechSynthesis ? speechSynthesis.getVoices() : []; this.chosen = {}; },
+    gender(v) { return this.FEMALE.test(v.name) ? "f" : this.MALE.test(v.name) ? "m" : "?"; },
+    pick(spec, speaker) {
+      spec = typeof spec === "string" ? { gender: spec } : spec || {};
+      const pitch = spec.pitch || (spec.gender === "f" ? 1.15 : 0.9), rate = (spec.rate || 1) * 0.95;
+      const key = speaker || spec.gender;
+      if (this.chosen[key] === undefined) {
+        const want = spec.accent === "fr" ? /^fr/i : /^en-GB/i;
+        const byLang = (re) => this.list.filter((v) => re.test(v.lang));
+        let pool = byLang(want);
+        if (!pool.length) pool = byLang(/^en-GB/i);
+        if (!pool.length) pool = byLang(/^en/i);
+        const same = pool.filter((v) => this.gender(v) === spec.gender);
+        const cands = same.length ? same : pool;
+        // spread different speakers over the voices available
+        let h = 0;
+        for (const ch of String(key)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+        this.chosen[key] = cands.length ? cands[h % cands.length] : null;
+      }
+      return { voice: this.chosen[key], pitch, rate };
+    },
+  };
+  if (window.speechSynthesis) { Voices.load(); speechSynthesis.onvoiceschanged = () => Voices.load(); }
+
   /* ---------------- Subtitles (and optional spoken voice) ---------------- */
   const Sub = {
-    token: 0, speaking: false, voiceOn: false, skip: null, typing: false,
+    token: 0, speaking: false, voiceOn: false, skip: null, typing: false, active: false, speaker: null,
     timeOfDay() {
       const h = new Date().getHours();
       return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
     },
     async say(lines, speaker, voice) {
       const my = ++this.token;
+      this.active = true;
+      this.speaker = speaker || null;
       for (const raw of lines) {
         if (my !== this.token) return;
         await this.line(raw.replace("{tod}", this.timeOfDay()), speaker, voice, my);
       }
-      if (my === this.token) this.hide();
+      if (my === this.token) { this.hide(); this.active = false; this.speaker = null; }
     },
     line(text, speaker, voice, my) {
       return new Promise((resolve) => {
@@ -242,12 +304,16 @@
         el.textContent = "";
         this.speaking = !!speaker;
         this.typing = true;
+        let talking = false;
         if (this.voiceOn && speaker && window.speechSynthesis) {
           speechSynthesis.cancel();
           const u = new SpeechSynthesisUtterance(text);
-          const v = speechSynthesis.getVoices().filter((x) => /en-GB/i.test(x.lang));
-          if (v.length) u.voice = v[voice === "f" ? Math.min(1, v.length - 1) : 0];
-          u.lang = "en-GB"; u.rate = 0.95; u.pitch = voice === "f" ? 1.2 : 0.85;
+          const v = Voices.pick(voice, speaker);
+          if (v.voice) { u.voice = v.voice; u.lang = v.voice.lang; } else u.lang = "en-GB";
+          u.rate = v.rate; u.pitch = v.pitch;
+          talking = true;
+          u.onend = u.onerror = () => { talking = false; };
+          setTimeout(() => { talking = false; }, 25000);
           speechSynthesis.speak(u);
         }
         let i = 0, done = false, holdTimer = null;
@@ -260,9 +326,11 @@
         };
         const startHold = () => {
           this.typing = false;
-          this.speaking = false;
+          this.speaking = talking;
           el.textContent = text;
-          holdTimer = setTimeout(finish, Math.max(2200, text.length * 48));
+          // move on after a reading pause, but never cut a spoken voice off mid-sentence
+          const after = () => { if (talking) { this.speaking = true; holdTimer = setTimeout(after, 150); } else { this.speaking = false; holdTimer = setTimeout(finish, 700); } };
+          holdTimer = setTimeout(after, Math.max(2200, text.length * 48) - 700);
         };
         const typer = setInterval(() => {
           if (my !== this.token) { finish(); return; }
@@ -272,7 +340,7 @@
         }, 26);
         this.skip = () => {
           if (this.typing) { clearInterval(typer); startHold(); }
-          else finish();
+          else { if (talking && window.speechSynthesis) speechSynthesis.cancel(); talking = false; finish(); }
         };
       });
     },
@@ -285,14 +353,27 @@
       if (this.skip) this.skip = null;
       if (window.speechSynthesis) speechSynthesis.cancel();
       this.hide();
+      this.active = false;
+      this.speaker = null;
     },
   };
   $("subtitle").addEventListener("click", () => Sub.skip && Sub.skip());
 
   /* ---------------- Prompts ---------------- */
-  function showPrompt(kind, shop) {
-    S.prompt = { kind, shop };
+  function showPrompt(kind, shop, escort) {
+    S.prompt = { kind, shop, escort };
     const d = shop.def;
+    if (kind === "escort") {
+      const st = escort.staff;
+      $("promptTitle").textContent = st.def.name;
+      $("promptSub").textContent = st.def.title || "";
+      $("promptText").textContent = st.def.escort.prompt;
+      $("promptYes").textContent = "Yes, please";
+      $("promptNo").textContent = "I'll find my own way";
+      $("prompt").hidden = false;
+      return;
+    }
+    $("promptYes").textContent = "Yes";
     if (kind === "enter") {
       $("promptTitle").textContent = d.sign;
       $("promptSub").textContent = d.subsign;
@@ -312,13 +393,16 @@
   }
   $("promptYes").addEventListener("click", () => {
     if (!S.prompt) return;
-    const { kind, shop } = S.prompt;
+    const { kind, shop, escort } = S.prompt;
     hidePrompt();
-    if (kind === "enter") enterShop(shop); else exitShop();
+    if (kind === "enter") enterShop(shop);
+    else if (kind === "escort") runEscort(escort);
+    else exitShop();
   });
   $("promptNo").addEventListener("click", () => {
     if (!S.prompt) return;
-    S.dismissed.add(S.prompt.kind + S.prompt.shop.def.id);
+    if (S.prompt.kind === "escort") S.dismissed.add("escort" + S.prompt.escort.role);
+    else S.dismissed.add(S.prompt.kind + S.prompt.shop.def.id);
     hidePrompt();
   });
 
@@ -363,28 +447,99 @@
     goInside(shop);
     await fadeTo(0, 0.7);
     S.mode = "shop";
-    const k = shop.def.keeper;
-    Sub.say(shop.def.greeting, k.name, k.look);
+    const it = S.interior;
+    if (it.staff && it.staff.length) {
+      const host = it.staff.find((s) => s.def.role === "doorman") || it.staff[0];
+      host.greeted = true;
+      Sub.say(host.def.greet, host.def.name, host.def.voice);
+    } else {
+      const k = shop.def.keeper;
+      Sub.say(shop.def.greeting, k.name, k.look);
+    }
   }
 
   function goInside(shop) {
     if (!interiors[shop.def.id]) {
-      interiors[shop.def.id] = RC.buildInterior(shop.def);
-      interiors[shop.def.id].scene.environment = envTex;
+      const it = RC.buildInterior(shop.def);
+      it.scene.environment = it.envProbe ? captureEnv(it) : envTex;
+      interiors[shop.def.id] = it;
     }
     const it = interiors[shop.def.id];
     S.shop = shop;
     S.interior = it;
     S.scene = it.scene;
-    S.pos.set(it.spawn.x, 0, it.spawn.z);
+    S.pos.set(it.spawn.x, it.spawn.y || 0, it.spawn.z);
+    S.eyeY = EYE + S.pos.y;
     S.yaw = it.spawn.yaw;
     S.pitch = -0.05;
+    S.area = null;
     S.dismissed.delete("exit" + shop.def.id);
+    (it.staff || []).forEach((s) => { s.greeted = false; s.chatIdx = 0; });
+    (it.escorts || []).forEach((e) => S.dismissed.delete("escort" + e.role));
+    handScene.environment = it.scene.environment;
     handHemi.color.set("#ffe2bc");
     handSun.color.set("#ffcf90");
     Snd.setInside(true);
     $("place").textContent = shop.def.sign;
     $("btnLeave").hidden = false;
+  }
+
+  /* ---------------- A member of staff shows you up the stairs ---------------- */
+  function pathLen(pts) { let L = 0; for (let i = 1; i < pts.length; i++) L += pts[i].distanceTo(pts[i - 1]); return L; }
+  function pointAt(pts, s, out) {
+    out = out || new V3();
+    for (let i = 1; i < pts.length; i++) {
+      const d = pts[i].distanceTo(pts[i - 1]);
+      if (s <= d || i === pts.length - 1) return out.lerpVectors(pts[i - 1], pts[i], d > 0 ? Math.min(1, Math.max(0, s / d)) : 1);
+      s -= d;
+    }
+    return out.copy(pts[pts.length - 1]);
+  }
+  function faceAlong(obj, from, to, k) {
+    const dx = to.x - from.x, dz = to.z - from.z;
+    if (dx * dx + dz * dz > 1e-6) obj.rotation.y = lerpAngle(obj.rotation.y, Math.atan2(dx, dz), k);
+  }
+
+  async function runEscort(e) {
+    const st = e.staff, it = S.interior;
+    S.mode = "cutscene";
+    clearInput();
+    hideHover();
+    st.mode = "escort";
+    st.route = null;
+    Sub.say(st.def.escort.start, st.def.name, st.def.voice);
+    const sPath = [st.person.group.position.clone()].concat(e.path.map((p) => new V3(p[0], p[1], p[2])));
+    const pPath = [S.pos.clone()].concat(e.path.slice(1).map((p) => new V3(p[0], p[1], p[2])));
+    const sLen = pathLen(sPath), pLen = Math.max(0, pathLen(pPath) - 1.4);
+    const speed = 1.25, delay = 1.3;
+    const dur = Math.max(sLen / speed, delay + pLen / speed) + 0.3;
+    const sp = new V3(), pp = new V3(), prev = new V3();
+    await tween(dur, (k) => {
+      const t = k * dur;
+      prev.copy(st.person.group.position);
+      pointAt(sPath, Math.min(sLen, t * speed), sp);
+      st.person.group.position.copy(sp);
+      faceAlong(st.person.group, prev, sp, 0.2);
+      st.walking = t * speed < sLen ? speed : 0;
+      pointAt(pPath, Math.min(pLen, Math.max(0, (t - delay) * speed)), pp);
+      prev.copy(S.pos);
+      S.pos.copy(pp);
+      if (prev.distanceToSquared(pp) > 1e-7) S.bobPhase += 0.05;
+      const head = st.person.group.position.clone().add(new V3(0, 1.55, 0));
+      S.yaw = lerpAngle(S.yaw, yawTo(S.pos, head), 0.08);
+      S.pitch = lerp(S.pitch, Math.atan2(head.y - (S.pos.y + EYE), Math.max(0.5, Math.hypot(head.x - S.pos.x, head.z - S.pos.z))), 0.06);
+    });
+    st.walking = 0;
+    st.mode = "host";
+    S.mode = "shop";
+    S.dismissed.add("escort" + e.role);
+    await Sub.say(st.def.escort.arrive, st.def.name, st.def.voice);
+    // after a moment, walk back down to their post
+    setTimeout(() => {
+      if (S.interior !== it) { st.person.group.position.copy(st.post.pos); st.person.group.rotation.y = st.post.ry; st.mode = "post"; return; }
+      st.route = { pts: sPath.slice().reverse(), s: 0, len: sLen };
+      st.mode = "return";
+    }, 2500);
   }
 
   async function exitShop() {
@@ -395,9 +550,18 @@
     hideHover();
     if (S.holding) putBack(true);
     const shop = S.shop, it = S.interior;
-    Sub.say([shop.def.farewell], shop.def.keeper.name, shop.def.keeper.look);
+    const bye = it.staff && it.staff.length ? (it.staff.find((s) => s.def.role === "doorman") || it.staff[0]) : null;
+    Sub.say([shop.def.farewell], bye ? bye.def.name : shop.def.keeper.name, bye ? bye.def.voice : shop.def.keeper.look);
+    const stand = it.exit ? new V3(it.exit.x + 0.15, it.exit.y, it.exit.z) : new V3(0.15, 0, it.bounds.maxZ - 0.35);
+    if (S.pos.distanceTo(stand) > 3.5) {
+      // far from the door (or upstairs): skip the walk
+      await fadeTo(1, 0.5);
+      S.pos.copy(stand).add(new V3(0, 0, -1.2));
+      S.eyeY = EYE + stand.y;
+      S.yaw = Math.PI; S.pitch = 0;
+      await fadeTo(0, 0.4);
+    }
     const p0 = S.pos.clone(), y0 = S.yaw, pi0 = S.pitch;
-    const stand = new THREE.Vector3(0.15, 0, it.bounds.maxZ - 0.35);
     await tween(1.1, (k) => {
       const e = ease(k);
       S.pos.lerpVectors(p0, stand, e);
@@ -417,11 +581,14 @@
     S.interior = null;
     S.shop = null;
     S.pos.copy(shop.front);
+    S.pos.y = 0;
+    S.eyeY = EYE;
     S.yaw = yawTo(shop.step, shop.front) + 0.5;
     S.pitch = 0;
     S.dismissed.add("enter" + shop.def.id);
     handHemi.color.set("#c8d0e0");
     handSun.color.set("#ffd8a8");
+    handScene.environment = envTex;
     Snd.setInside(false);
     $("place").textContent = RC.STREET_NAME;
     $("btnLeave").hidden = true;
@@ -439,10 +606,35 @@
     ndc.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects(S.interior.clickables, true);
-    if (!hits.length) return null;
-    let o = hits[0].object;
-    while (o && !o.userData.info) o = o.parent;
-    return o ? { item: o, dist: hits[0].distance } : null;
+    for (const h of hits) {
+      if (!h.object.visible || (h.object.material && h.object.material.blending === THREE.AdditiveBlending)) continue;
+      let o = h.object;
+      while (o && !o.userData.info && !o.userData.staffRole) o = o.parent;
+      if (!o) continue;
+      if (o.userData.staffRole) return { staff: S.interior.staff.find((s) => s.def.role === o.userData.staffRole), dist: h.distance };
+      return { item: o, dist: h.distance };
+    }
+    return null;
+  }
+
+  // Who answers questions about an item: staff in that part of the house, else the nearest, else the keeper
+  function speakerFor(info) {
+    const it = S.interior;
+    if (it.staff && it.staff.length) {
+      const here = it.staff.filter((s) => s.area === info.area && s.mode !== "escort");
+      const pool = here.length ? here : it.staff;
+      let best = pool[0], bd = Infinity;
+      pool.forEach((s) => { const d = s.person.group.position.distanceTo(S.pos); if (d < bd) { bd = d; best = s; } });
+      return { name: best.def.name, voice: best.def.voice };
+    }
+    return { name: S.shop.def.keeper.name, voice: S.shop.def.keeper.look };
+  }
+
+  function talkTo(st) {
+    if (!st || st.mode === "escort") return;
+    const lines = st.greeted ? [st.def.chat[st.chatIdx++ % st.def.chat.length]] : st.def.greet;
+    st.greeted = true;
+    Sub.say(lines, st.def.name, st.def.voice);
   }
 
   async function pickUp(item) {
@@ -460,7 +652,7 @@
     await wait(0.15);
 
     // a copy of the item travels to the hand; the original disappears from the shelf
-    const box = new THREE.Box3().setFromObject(item);
+    const box = RC.kit ? RC.kit.bounds(item) : new THREE.Box3().setFromObject(item);
     const size = box.getSize(new THREE.Vector3());
     const centre = box.getCenter(new THREE.Vector3());
     const copy = item.clone();
@@ -485,7 +677,8 @@
     $("itemLink").href = S.shop.def.link;
     $("itemCard").hidden = false;
     S.mode = "shop";
-    Sub.say([info.note], S.shop.def.keeper.name, S.shop.def.keeper.look);
+    const who = speakerFor(info);
+    Sub.say([info.note], who.name, who.voice);
   }
 
   async function putBack(instant) {
@@ -519,11 +712,13 @@
     const hit = itemAt(x, y);
     if (!hit) { hideHover(); return; }
     const tag = $("hoverTag");
-    tag.textContent = hit.dist < 3.4 ? hit.item.userData.info.name : hit.item.userData.info.name + " (step closer)";
+    const label = hit.staff ? hit.staff.def.name + (hit.staff.def.title ? ", " + hit.staff.def.title.split(",")[0] : "") : hit.item.userData.info.name;
+    const reach = hit.staff ? 5 : 3.4;
+    tag.textContent = hit.dist < reach ? (hit.staff ? label + " · click to talk" : label) : label + " (step closer)";
     tag.style.left = x + "px";
     tag.style.top = y + "px";
     tag.hidden = false;
-    renderer.domElement.style.cursor = hit.dist < 3.4 ? "pointer" : "";
+    renderer.domElement.style.cursor = hit.dist < reach ? "pointer" : "";
   }
 
   /* ---------------- Look around (drag) and click ---------------- */
@@ -551,7 +746,10 @@
     drag = null;
     if (wasClick && S.mode === "shop" && !S.holding) {
       const hit = itemAt(e.clientX, e.clientY);
-      if (hit) {
+      if (hit && hit.staff) {
+        if (hit.dist < 5) talkTo(hit.staff);
+        else Sub.say(["(Step a little closer to speak to " + hit.staff.def.name + ".)"]);
+      } else if (hit) {
         if (hit.dist < 3.4) pickUp(hit.item);
         else Sub.say(["(Step a little closer to pick that up.)"]);
       }
@@ -605,6 +803,56 @@
     });
   }
 
+  /* Multi-storey walking: the floor under you is whichever floor or stair surface at (x, z)
+     is nearest your current height (so stairs carry you up, and you can't step off a landing) */
+  function navHeight(nav, x, z, y0) {
+    let best = null, bd = 0.6;
+    const inR = (r) => x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1;
+    for (const f of nav.floors) {
+      if (!f.rects.some(inR) || (f.holes && f.holes.some(inR))) continue;
+      const d = Math.abs(f.y - y0);
+      if (d < bd) { bd = d; best = f.y; }
+    }
+    for (const s of nav.stairs) {
+      if (x < s.x0 || x > s.x1 || z < Math.min(s.zB, s.zT) || z > Math.max(s.zB, s.zT)) continue;
+      const y = s.yB + ((s.yT - s.yB) * (z - s.zB)) / (s.zT - s.zB);
+      const d = Math.abs(y - y0);
+      if (d < bd) { bd = d; best = y; }
+    }
+    return best;
+  }
+  function collide3(p, obstacles) {
+    const R = 0.3;
+    for (const o of obstacles) {
+      if (o.y0 !== undefined && !(p.y + 0.3 < o.y1 && p.y + 1.7 > o.y0)) continue;
+      if (o.box) {
+        const bb = o.box;
+        if (p.x > bb.minX - R && p.x < bb.maxX + R && p.z > bb.minZ - R && p.z < bb.maxZ + R) {
+          const opts = [[p.x - (bb.minX - R), "x", bb.minX - R], [(bb.maxX + R) - p.x, "x", bb.maxX + R], [p.z - (bb.minZ - R), "z", bb.minZ - R], [(bb.maxZ + R) - p.z, "z", bb.maxZ + R]];
+          opts.sort((a, c) => a[0] - c[0]);
+          p[opts[0][1]] = opts[0][2];
+        }
+      } else {
+        const dx = p.x - o.x, dz = p.z - o.z, d = Math.hypot(dx, dz), min = o.r + R;
+        if (d < min && d > 0.0001) { p.x = o.x + (dx / d) * min; p.z = o.z + (dz / d) * min; }
+      }
+    }
+  }
+  const navTmp = new V3();
+  function navMove(it, dt) {
+    const tryAt = (x, z) => {
+      if (navHeight(it.nav, x, z, S.pos.y) === null) return false;
+      navTmp.set(x, S.pos.y, z);
+      collide3(navTmp, it.obstacles);
+      const y = navHeight(it.nav, navTmp.x, navTmp.z, S.pos.y);
+      if (y === null) return false;
+      S.pos.set(navTmp.x, y, navTmp.z);
+      return true;
+    };
+    const nx = S.pos.x + S.vel.x * dt, nz = S.pos.z + S.vel.z * dt;
+    if (!tryAt(nx, nz) && !tryAt(nx, S.pos.z) && !tryAt(S.pos.x, nz)) S.vel.multiplyScalar(0.5);
+  }
+
   function move(dt) {
     const k = S.keys, pd = S.pad;
     const fwd = (k.f || pd.f ? 1 : 0) - (k.b || pd.b ? 1 : 0);
@@ -616,8 +864,11 @@
     want.multiplyScalar(2.8);
     S.vel.lerp(want, 1 - Math.exp(-dt * 8));
     const world = S.mode === "shop" ? S.interior : street;
-    S.pos.addScaledVector(S.vel, dt);
-    collide(S.pos, world);
+    if (world.nav) navMove(world, dt);
+    else {
+      S.pos.addScaledVector(S.vel, dt);
+      collide(S.pos, world);
+    }
     const speed = S.vel.length();
     S.walkAmt = lerp(S.walkAmt, Math.min(1, speed / 2.8), 1 - Math.exp(-dt * 6));
     if (speed > 0.3) {
@@ -641,12 +892,83 @@
       } else if (S.prompt) hidePrompt();
     } else if (S.mode === "shop" && !S.holding) {
       const it = S.interior;
-      const atDoor = S.pos.z > it.exitZ && Math.abs(S.pos.x) < 1.6;
+      const atDoor = it.exit
+        ? Math.hypot(S.pos.x - it.exit.x, S.pos.z - it.exit.z) < it.exit.r && Math.abs(S.pos.y - it.exit.y) < 0.5
+        : S.pos.z > it.exitZ && Math.abs(S.pos.x) < 1.6;
       if (!atDoor) S.dismissed.delete("exit" + S.shop.def.id);
+      // a member of staff offers to take you upstairs
+      let offer = null;
+      (it.escorts || []).forEach((e) => {
+        e.staff = e.staff || (it.staff || []).find((s) => s.def.role === e.role);
+        const tr = e.trigger;
+        const near = Math.hypot(S.pos.x - tr.x, S.pos.z - tr.z) < tr.r && Math.abs(S.pos.y - tr.y) < 0.6;
+        if (!near && Math.hypot(S.pos.x - tr.x, S.pos.z - tr.z) > tr.r + 1.2) S.dismissed.delete("escort" + e.role);
+        if (near && e.staff && e.staff.mode === "post" && !S.dismissed.has("escort" + e.role)) offer = e;
+      });
       if (atDoor && !S.dismissed.has("exit" + S.shop.def.id)) {
         if (!S.prompt) showPrompt("exit", S.shop);
+      } else if (offer) {
+        if (!S.prompt || S.prompt.escort !== offer) showPrompt("escort", S.shop, offer);
       } else if (S.prompt) hidePrompt();
+      // staff greet you the first time you come near them
+      if (it.staff && !Sub.active) {
+        for (const st of it.staff) {
+          if (st.greeted || st.mode !== "post") continue;
+          const p = st.person.group.position;
+          if (Math.abs(p.y - S.pos.y) < 1 && Math.hypot(p.x - S.pos.x, p.z - S.pos.z) < 3.0) { talkTo(st); break; }
+        }
+      }
+      // which part of the house are we in?
+      if (it.areaAt) {
+        const a = it.areaAt(S.pos);
+        const id = a ? a.id : null;
+        if (id !== S.area) {
+          S.area = id;
+          $("place").textContent = S.shop.def.sign + (a ? " · " + a.name : "");
+          if (a && a.id !== "stairs") showToast(a.name, a.floor);
+        }
+      }
     }
+  }
+
+  let toastTimer = null;
+  function showToast(name, floor) {
+    const t = $("areaToast");
+    if (!t) return;
+    $("areaName").textContent = name;
+    $("areaFloor").textContent = floor || "";
+    t.hidden = false;
+    t.classList.remove("out");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.classList.add("out"); toastTimer = setTimeout(() => (t.hidden = true), 700); }, 2600);
+  }
+
+  /* ---------------- Staff each frame: look at you, talk, walk back to their post ---------------- */
+  const camWorld = new V3();
+  function updateStaff(dt, t) {
+    const it = S.interior;
+    camWorld.copy(camera.position);
+    it.staff.forEach((st) => {
+      const g = st.person.group;
+      if (st.route) {
+        const prev = g.position.clone();
+        st.route.s += dt * 1.1;
+        pointAt(st.route.pts, Math.min(st.route.s, st.route.len), g.position);
+        faceAlong(g, prev, g.position, 0.15);
+        st.walking = 1.1;
+        if (st.route.s >= st.route.len) {
+          st.route = null; st.walking = 0; st.mode = "post";
+          g.position.copy(st.post.pos);
+        }
+      } else if (st.mode === "post" && !st.walking) {
+        // drift back to facing their usual way when nobody is around
+        const far = g.position.distanceTo(S.pos) > 5 || Math.abs(g.position.y - S.pos.y) > 1;
+        if (far) g.rotation.y = lerpAngle(g.rotation.y, st.post.ry, dt * 0.8);
+      }
+      const near = Math.abs(g.position.y - S.pos.y) < 1.5 && g.position.distanceTo(S.pos) < 4.5;
+      const talking = Sub.speaking && Sub.speaker === st.def.name;
+      st.person.update(dt, t, { look: near || talking ? camWorld : null, talking, walking: st.walking || 0, turn: st.mode !== "escort" });
+    });
   }
 
   /* ---------------- Hands each frame ---------------- */
@@ -683,7 +1005,8 @@
   /* ---------------- Main loop ---------------- */
   let last = performance.now(), time = 0;
   function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000);
+    // RC.debugTimeScale lets automated tests fast-forward cutscenes; normally unset
+    const dt = Math.min(0.05, (now - last) / 1000) * (RC.debugTimeScale || 1);
     last = now;
     time += dt;
 
@@ -699,20 +1022,26 @@
     else { S.vel.multiplyScalar(0.8); S.walkAmt *= 0.9; }
 
     // raise the eye a little on the pavement (kerb height)
-    const floorY = S.scene === streetScene && Math.abs(S.pos.x) > 4.1 ? 0.15 : 0;
-    S.eyeY = lerp(S.eyeY, EYE + floorY, 1 - Math.exp(-dt * 10));
+    const floorY = S.scene === streetScene && Math.abs(S.pos.x) > 4.1 ? 0.15 : S.pos.y;
+    S.eyeY = lerp(S.eyeY, EYE + floorY, 1 - Math.exp(-dt * 12));
     const bob = reduceMotion ? 0 : Math.sin(S.bobPhase * 2) * 0.025 * S.walkAmt;
     camera.position.set(S.pos.x, S.eyeY + bob, S.pos.z);
     camera.rotation.set(S.pitch, S.yaw, 0);
     camera.updateMatrixWorld();
 
     if (street && S.scene === streetScene) street.update(time);
-    if (S.interior) S.interior.update(time, Sub.speaking, S.pos);
+    if (S.interior) {
+      if (S.interior.nav) {
+        S.interior.update(time, dt, { cam: camera.position });
+        updateStaff(dt, time);
+      } else S.interior.update(time, Sub.speaking, S.pos);
+    }
     if (S.mode !== "loading" && S.mode !== "intro") {
       updateHands(dt, time);
       checkProximity();
     }
 
+    renderer.toneMappingExposure = S.interior && S.interior.exposure ? S.interior.exposure : 1.0;
     renderer.clear();
     renderer.render(S.scene, camera);
     renderer.clearDepth();
@@ -786,7 +1115,7 @@
   });
 
   // Handy for testing from the browser console
-  RC.game = { S, enterShop, exitShop, pickUp, get street() { return street; } };
+  RC.game = { S, enterShop, exitShop, pickUp, runEscort, renderer, camera, navHeight, collide3, get street() { return street; } };
 
   boot();
 })();

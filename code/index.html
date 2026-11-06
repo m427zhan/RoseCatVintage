@@ -79,6 +79,12 @@
   </div>
 
   <div id="hoverTag" hidden></div>
+
+  <!-- Name of the room you have just walked into -->
+  <div id="areaToast" hidden aria-live="polite">
+    <span id="areaName"></span>
+    <span id="areaFloor"></span>
+  </div>
   <div id="fade"></div>
 
   <!-- ========== Title card ========== -->
@@ -92,7 +98,7 @@
       <ul class="intro-how">
         <li><strong>Look around:</strong> drag with the mouse (or your finger)</li>
         <li><strong>Walk:</strong> hold the arrow buttons, or use W A S D / arrow keys</li>
-        <li><strong>Inside a shop:</strong> click an item to pick it up</li>
+        <li><strong>Inside a shop:</strong> click an item to pick it up, or a member of staff to talk</li>
       </ul>
       <button id="btnStart" type="button" class="btn-gold btn-big" disabled>Step onto the street</button>
       <p id="introStatus" class="intro-status">Lighting the gas lamps…</p>
@@ -108,6 +114,7 @@
       <li><strong>Walk:</strong> hold ▲ ▼ ◀ ▶, or W A S D / arrow keys.</li>
       <li><strong>Enter a shop:</strong> walk up to its door and choose “Yes”.</li>
       <li><strong>Inside:</strong> click any item to pick it up. “Put it back” or Esc to return it.</li>
+      <li><strong>Staff:</strong> click anyone in the shop to chat. Near the stairs, they will offer to show you up, or just walk up yourself.</li>
       <li><strong>Subtitles:</strong> click them (or press Space) to move on.</li>
       <li><strong>Leave:</strong> walk back to the door, or press “Leave the shop”.</li>
     </ul>
@@ -122,6 +129,14 @@
   <script src="js/street/config.js"></script>
   <script src="js/street/textures.js"></script>
   <script src="js/street/props.js"></script>
+  <script src="js/street/pbr.js"></script>
+  <script src="js/street/kit.js"></script>
+  <script src="js/street/furniture.js"></script>
+  <script src="js/street/flora.js"></script>
+  <script src="js/street/people.js"></script>
+  <script src="js/street/jewels.js"></script>
+  <script src="js/street/facade-maison.js"></script>
+  <script src="js/street/maison.js"></script>
   <script src="js/street/world.js"></script>
   <script src="js/street/game.js"></script>
 </body>

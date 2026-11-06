@@ -416,7 +416,7 @@
   };
 
   function makeItem(kind) {
-    const make = items[kind] || items.books;
+    const make = items[kind] || (RC.extraItems && RC.extraItems[kind]) || items.books;
     const g = make();
     g.userData.kind = kind;
     return g;

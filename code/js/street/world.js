@@ -41,6 +41,7 @@
     for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? c2 : c1; g.fillRect(i * 32, 0, 32, 64); }
     const t = new THREE.CanvasTexture(c);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.encoding = THREE.sRGBEncoding;
     return t;
   }
 
@@ -127,6 +128,7 @@
 
   /* ---------- A shop front ---------- */
   function buildShop(def, W, H, seed) {
+    if (def.facade && RC.facades && RC.facades[def.facade]) return RC.facades[def.facade](def, W, H, seed);
     const g = new THREE.Group();
     const front = mat(def.front, { r: 0.45 });
     const frontDark = mat(RC.tex.shade(def.front, -0.06), { r: 0.5 });
@@ -492,6 +494,7 @@
 
   /* ---------- Shop interiors ---------- */
   RC.buildInterior = function (def) {
+    if (def.interior && RC.interiors && RC.interiors[def.interior]) return RC.interiors[def.interior](def);
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#120c08");
     scene.fog = new THREE.Fog("#1a120c", 10, 22);

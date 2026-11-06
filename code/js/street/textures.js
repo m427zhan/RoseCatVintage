@@ -25,6 +25,7 @@
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.repeat.set(repeatX || 1, repeatY || 1);
     t.anisotropy = 4;
+    t.encoding = THREE.sRGBEncoding;
     return t;
   }
 
@@ -178,6 +179,7 @@
     g.fillText(sub, 512, 122);
     const t = new THREE.CanvasTexture(c);
     t.anisotropy = 8;
+    t.encoding = THREE.sRGBEncoding;
     return t;
   }
 
@@ -196,6 +198,7 @@
     g.fillText(text, c.width / 2, c.height / 2 + 2);
     const t = new THREE.CanvasTexture(c);
     t.anisotropy = 8;
+    t.encoding = THREE.sRGBEncoding;
     return t;
   }
 
@@ -211,7 +214,9 @@
       const a = (i / 12) * Math.PI * 2;
       g.fillText(n, 128 + Math.sin(a) * 98, 128 - Math.cos(a) * 98);
     });
-    return new THREE.CanvasTexture(c);
+    const t = new THREE.CanvasTexture(c);
+    t.encoding = THREE.sRGBEncoding;
+    return t;
   }
 
   // Soft radial glow for lamps and lit windows
